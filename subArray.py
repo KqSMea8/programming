@@ -66,7 +66,7 @@ def good(array):
             length = 0
             
     return d
-
+# http://blog.csdn.net/wdxin1322/article/details/17077297
 def sum_dp(array):
     sum = array[ : ]
     sum[0] = sum[0]
