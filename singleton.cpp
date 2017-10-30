@@ -1,7 +1,6 @@
 #include <iostream>
 #include <mutex>
 
-std::mutex g_mutex;
 
 class SingleTon {
 	public:
@@ -10,9 +9,11 @@ class SingleTon {
 	      SingleTon();
 	      ~SingleTon();
 	      static SingleTon *m_instance;
+              static std::mutex m_mutex;
 };
 
 SingleTon * SingleTon::m_instance = NULL;
+std::mutex SingleTon::m_mutex;
 
 SingleTon::SingleTon() {
 	std::cout << __FUNCTION__ << ", " << __LINE__ << std::endl;
@@ -25,7 +26,7 @@ SingleTon::~SingleTon() {
 SingleTon* SingleTon::getInstance() {
 	std::cout << __FUNCTION__ << ", " << __LINE__ << std::endl;
 	if (NULL == m_instance) {
-		std::lock_guard<std::mutex> lck(g_mutex);
+		std::lock_guard<std::mutex> lck(m_mutex);
 		if (NULL == m_instance) {
 			m_instance = new SingleTon();
 		}
