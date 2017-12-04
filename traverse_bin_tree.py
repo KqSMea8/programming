@@ -16,6 +16,25 @@ def top_to_down_traverse(Tree):
         if temp.right:
             queue.append(temp.right)
 
+def pre_traverse_non_recursive(Tree):
+    stack = collections.deque()
+    p = Tree
+    while p or len(stack):
+        while p:
+            print p.data
+            """
+            needn't push leaf node into stack
+            """
+            #if (not p.left) and (not p.right): #leaf node
+            #    p = None
+            #    break;
+            stack.append(p)
+            p = p.left
+        if len(stack):
+            p = stack.pop()
+            p = p.right
+
+
 def pre_traverse(Tree):
     if Tree:
         print Tree.data
@@ -76,4 +95,6 @@ n6.right = n7
 n10.left = n9
 n10.right = n11
 
-top_to_down_traverse(n8)
+pre_traverse(n8)
+print
+pre_traverse_non_recursive(n8)
