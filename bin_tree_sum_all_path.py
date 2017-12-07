@@ -1,3 +1,15 @@
+def func_1(Tree, path = [], top = -1, sum_ = 0):
+    if Tree:
+        top += 1
+        path.insert(top, Tree.data)
+        sum_ += Tree.data
+        if (not Tree.left) and (not Tree.right): #leaf node
+            print path[ : top + 1],
+            print "sum:", sum_
+        else:
+            func_1(Tree.left, path, top, sum_)
+            func_1(Tree.right, path, top, sum_)
+
 def func(Tree):
     stack = []
     right_visited = []
