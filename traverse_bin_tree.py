@@ -3,6 +3,16 @@ import collections
 class Node:
     pass
 
+def print_n_layer(Tree, n):
+    if Tree == None or n < 0:
+        return 0
+    if n == 0:
+        print Tree.data,
+        return 1
+    left = print_n_layer(Tree.left, n - 1)
+    right = print_n_layer(Tree.right, n - 1)
+    return left or right
+
 def top_to_down_traverse(Tree):
     if not Tree:
         return
@@ -98,3 +108,7 @@ n10.right = n11
 pre_traverse(n8)
 print
 pre_traverse_non_recursive(n8)
+print
+for i in xrange(5):
+ have = print_n_layer(n8, i)
+ print have
