@@ -4,6 +4,35 @@
 
 using namespace std;
 
+void BinTree::BST_delete(BinTree **root, int data) {
+  BinTree *parent = NULL;
+  BinTree *pos = BST_find__(*root, data, &parent);
+  if (!pos) {
+    return;
+  }
+  if (!parent) { // delete root
+    *root = pos->lchild ? pos->lchild : pos->rchild;
+  } else {
+    if (parent->data > data) {
+      parent->lchild = pos->lchild ? pos->lchild : pos->rchild;
+    } else {
+      parent->rchild = pos->lchild ? pos->lchild : pos->rchild;
+    }
+  }
+  /*
+   * if lchild is null, do nothing;
+   * if lchild is not null, but rchild is null, do nothing.
+   */
+  if (pos->lchild && pos->rchild) {
+    BinTree *p = pos->lchild;
+    while (p->rchild)
+      p = p->rchild;
+    p->rchild = pos->rchild;
+  }
+
+  delete pos;
+}
+
 void BinTree::LevelTraverse(const BinTree *root) {
   if (!root) {
     return;
@@ -37,23 +66,36 @@ void BinTree::LevelTraverse(const BinTree *root) {
   }
 }
 
-bool BinTree::search(int data) const {
-  if (this->data == data) {
+bool BinTree::BST_insert(BinTree **root, int data) {
+  BinTree *parent = NULL;
+  if (BST_find__(*root, data, &parent)) {
+    return false; // already exist
+  } else {
+    BinTree *node = new BinTree(data);
+    if (!parent) { // an empty tree
+      *root = node;
+    } else {
+      if (parent->data > data) {
+        parent->lchild = node;
+      } else {
+        parent->rchild = node;
+      }
+    }
     return true;
   }
-  bool ret = false;
-  if (lchild) {
-    ret = lchild->search(data);
-  }
-  if (ret) {
-    return ret; // find in left
-  }
+}
 
-  if (rchild) {
-    ret = rchild->search(data);
+bool BinTree::Search(const BinTree *root, int data) {
+  if (!root) {
+    return false;
   }
-
-  return ret;
+  if (root->data == data) {
+    return true;
+  }
+  if (Search(root->lchild, data)) {
+    return true;
+  }
+  return Search(root->rchild, data);
 }
 
 void BinTree::PreTraverse(const BinTree *root) {
@@ -66,16 +108,16 @@ void BinTree::PreTraverse(const BinTree *root) {
 
 void BinTree::MiddleTraverse(const BinTree *root) {
   if (root) {
-    PreTraverse(root->lchild);
+    MiddleTraverse(root->lchild);
     cout << root->data << endl;
-    PreTraverse(root->rchild);
+    MiddleTraverse(root->rchild);
   }
 }
 
 void BinTree::PostTraverse(const BinTree *root) {
   if (root) {
-    PreTraverse(root->lchild);
-    PreTraverse(root->rchild);
+    PostTraverse(root->lchild);
+    PostTraverse(root->rchild);
     cout << root->data << endl;
   }
 }
@@ -95,3 +137,23 @@ BinTree::BinTree(int data) {
 BinTree::~BinTree() {
 }
 
+const BinTree * BinTree::BST_find(const BinTree *root, int data) {
+  BinTree *parent = NULL;
+  return BST_find__(const_cast<BinTree *>(root), data, &parent);
+}
+
+
+BinTree * BinTree::BST_find__(BinTree *root, int data, BinTree **parent) {
+  if (!root) {
+    return NULL;
+  }
+  if (root->data == data) {
+    return root;
+  } else if (root->data > data) {
+    *parent = root;
+    return BST_find__(root->lchild, data, parent);
+  } else {
+    *parent = root;
+    return BST_find__(root->rchild, data, parent);
+  }
+}
