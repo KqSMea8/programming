@@ -11,6 +11,7 @@ public:
   static const BinTree *BST_find(const BinTree *root, int data);
   static bool BST_insert(BinTree **root, int data);
   static void BST_delete(BinTree **root, int data);
+  static void BST_delete_ex(BinTree **root, int data);
 
 private:
   int data;
