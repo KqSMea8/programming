@@ -3,6 +3,62 @@
 #include<queue>
 
 using namespace std;
+/*
+ * 均衡性更好
+ */
+void BinTree::BST_delete_ex(BinTree **root, int data) {
+  BinTree *parent = NULL;
+  BinTree *del, *del_parent;
+  BinTree *pos = BST_find__(*root, data, &parent);
+  if (!pos) {
+    return;
+  }
+  del_parent = pos;
+  // find the nearest 'pre' in left first
+  del = pos->lchild;
+  while (del && del->rchild) {
+    del_parent = del;
+    del = del->rchild;
+  }
+  if (del) {
+    pos->data = del->data;
+    if (del_parent == pos) {
+      pos->lchild = del->lchild;
+    } else {
+      del_parent->rchild = NULL;
+    }
+    delete del;
+    return;
+  }
+  // no 'pre' in left, then find the nearest 'post' in right
+  del = pos->rchild;
+  while (del && del->lchild) {
+    del_parent = del;
+    del = del->lchild;
+  }
+  if (del) {
+    pos->data = del->data;
+    if (del_parent == pos) {
+      pos->rchild = del->rchild;
+    } else {
+      del_parent->lchild = NULL;
+    }
+    delete del;
+    return;
+  }
+  // pos is a leaf node or root itself
+  if (parent) { // leaf
+    if (parent->data > data) {
+      parent->lchild = NULL;
+    } else {
+      parent->rchild = NULL;
+    }
+    delete pos;
+  } else {
+    *root = NULL; // root
+    delete pos;
+  }
+}
 
 void BinTree::BST_delete(BinTree **root, int data) {
   BinTree *parent = NULL;
@@ -109,7 +165,7 @@ void BinTree::PreTraverse(const BinTree *root) {
 void BinTree::MiddleTraverse(const BinTree *root) {
   if (root) {
     MiddleTraverse(root->lchild);
-    cout << root->data << endl;
+    cout << root->data << " ";
     MiddleTraverse(root->rchild);
   }
 }
