@@ -3,6 +3,129 @@
 #include<queue>
 
 using namespace std;
+
+bool BinTree::AVL_insert(BinTree **root, int data) {
+  bool no_used;
+  return AVL_insert__(root, data, &no_used);
+}
+
+/*
+ * references:1) https://blog.csdn.net/winder9898/article/details/51098211
+ *            2) 严蔚敏《数据结构》
+ */
+
+bool BinTree::AVL_insert__(BinTree **root, int data, bool *taller) {
+  BinTree *p;
+
+  if (*root == NULL) {
+    p = new BinTree(data);
+    p->avl_bf = AVL_EH;
+    *root = p;
+    *taller = true;
+    return true;
+  }
+
+  p = *root;
+
+  if (p->data == data) {
+    *taller = false;
+    return false;
+  }
+
+  if (p->data > data) {
+    if (!AVL_insert__(&(p->lchild), data, taller)) {
+      return false;
+    }
+    if (*taller) {
+      switch(p->avl_bf) {
+        case AVL_EH:
+          p->avl_bf = AVL_LH;
+          break;
+        case AVL_LH:
+          if (p->lchild->data > data) { // LL
+            AVL_r_rotate__(root);
+          } else { // LR
+            AVL_l_rotate__(&(p->lchild));
+            AVL_r_rotate__(root);
+          }
+          *taller = false;
+          break;
+        case AVL_RH:
+          p->avl_bf = AVL_EH;
+          *taller = false;
+          break;
+      }
+    }
+  } else {
+    if (!AVL_insert__(&(p->rchild), data, taller)) {
+      return false;
+    }
+    if (*taller) {
+      switch(p->avl_bf) {
+        case AVL_EH:
+          p->avl_bf = AVL_RH;
+          break;
+        case AVL_LH:
+          p->avl_bf = AVL_EH;
+          *taller = false;
+          break;
+        case AVL_RH:
+          if (p->rchild->data < data) { // RR
+            AVL_l_rotate__(root);
+          } else { // RL
+            AVL_r_rotate__(&(p->rchild));
+            AVL_l_rotate__(root);
+          }
+          *taller = false;
+          break;
+      }
+    }
+  }
+  return true;
+}
+
+void BinTree::AVL_l_rotate__(BinTree **unblanced) {
+  BinTree *p = (*unblanced)->rchild;
+  (*unblanced)->rchild = p->lchild;
+  p->lchild = *unblanced;
+  int ldeepth = Deepth((*unblanced)->lchild);
+  int rdeepth = Deepth((*unblanced)->rchild);
+  //cout << "*** " << ldeepth << ", " << rdeepth << ", " << ldeepth - rdeepth << endl;
+  (*unblanced)->avl_bf = (BF_TYPE)(ldeepth - rdeepth);
+  ldeepth = ldeepth > rdeepth ? ldeepth : rdeepth;
+  ldeepth += 1;
+  rdeepth -= p->avl_bf;
+  //cout << ldeepth << ", " << rdeepth << ", " << ldeepth - rdeepth << endl;
+  p->avl_bf = (BF_TYPE)(ldeepth - rdeepth);
+  *unblanced = p;
+}
+
+void BinTree::AVL_r_rotate__(BinTree **unblanced) {
+  BinTree *p = (*unblanced)->lchild;
+  (*unblanced)->lchild = p->rchild;
+  p->rchild = *unblanced;
+  int ldeepth = Deepth((*unblanced)->lchild);
+  int rdeepth = Deepth((*unblanced)->rchild);
+  //cout << "*** " << ldeepth << ", " << rdeepth << ", " << ldeepth - rdeepth << endl;
+  (*unblanced)->avl_bf = (BF_TYPE)(ldeepth - rdeepth);
+  rdeepth = ldeepth > rdeepth ? ldeepth : rdeepth;
+  rdeepth += 1;
+  ldeepth += p->avl_bf;
+  //cout << ldeepth << ", " << rdeepth << ", " << ldeepth - rdeepth << endl;
+  p->avl_bf = (BF_TYPE)(ldeepth - rdeepth);
+  *unblanced = p;
+}
+
+int BinTree::Deepth(const BinTree *root) {
+  if (!root) {
+    return 0;
+  }
+  int ldeepth = Deepth(root->lchild);
+  int rdeepth = Deepth(root->rchild);
+  int max = ldeepth > rdeepth ? ldeepth : rdeepth;
+  return max + 1;
+}
+
 /*
  * 均衡性更好
  */
