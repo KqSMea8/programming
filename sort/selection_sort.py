@@ -7,6 +7,5 @@ def selection_sort(l):
 	        min_index = j
 
         if min_index != i:
-	    temp = l[min_index]
-	    l[min_index] = l[i]
-	    l[i] = temp
+            # swap
+	    l[min_index], l[i] = l[i], l[min_index]

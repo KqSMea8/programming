@@ -1,8 +1,199 @@
 #include"BinTree.h"
 #include<iostream>
 #include<queue>
+#include<stack>
 
 using namespace std;
+
+void BinTree::AVL_delete(BinTree **root, int data) {
+  BinTree *parent = NULL;
+  BinTree *pos = BST_find__(*root, data, &parent);
+  if (!pos) {
+    return;
+  }
+
+  /*
+   * find the date actually be deleted
+   */
+  int actul_data;
+  bool delete_itself;
+  if (pos->lchild && pos->rchild) {// delete from the higher child
+    BinTree *del;
+    if (pos->avl_bf != AVL_RH) {
+       del = pos->lchild;
+       while (del && del->rchild) {
+         del = del->rchild;
+       }
+    } else {
+       del = pos->rchild;
+       while (del && del->lchild) {
+         del = del->lchild;
+       }
+    }
+    actul_data = del->data;
+    delete_itself = false;
+  } else {
+    actul_data = data;
+    delete_itself = true;
+  }
+  /*
+   * goto actul_data
+   */
+  stack<BinTree *> path;
+  path.push(NULL); // root's parent is NULL
+  BinTree *p = *root;
+  while (p->data != actul_data) {
+    path.push(p);
+    if (p->data > actul_data)
+      p = p->lchild;
+    else
+      p = p->rchild;
+  }
+
+  /*
+   * delete p
+   * p is leaf or only has one child
+   */
+  parent = path.top();
+  bool is_left_child;
+  if (p->lchild == NULL && p->rchild == NULL) { // leaf
+    if (parent == NULL) {
+      *root = NULL;
+    } else {
+      if (p->data > parent->data) {
+        is_left_child = false;
+        parent->rchild = NULL;
+      } else {
+        is_left_child = true;
+        parent->lchild = NULL;
+      }
+    }
+  } else {
+    if (parent == NULL) {
+      *root = p->lchild ? p->lchild : p->rchild;
+    } else {
+      if (p->data > parent->data) {
+        is_left_child = false;
+        parent->rchild = p->lchild ? p->lchild : p->rchild;
+      } else {
+        is_left_child = true;
+        parent->lchild = p->lchild ? p->lchild : p->rchild;
+      }
+    }
+  }
+  delete p;
+
+  /*
+   * adjusting
+   */
+  adjust_tree(path, is_left_child, root);
+
+  if (!delete_itself) {
+    pos->data = actul_data;
+  }
+}
+
+void adjust_tree(stack<BinTree *> &path, bool delete_from_left, BinTree **root) {
+  BinTree *parent;
+  bool lower;
+
+  while (path.size() > 1) {
+    parent = path.top();
+    path.pop();
+    lower = true;
+
+    //平衡因子为0，只需要调整平衡因子即可完成删除 
+    if (parent->avl_bf == BinTree::AVL_EH) {
+      if (delete_from_left) {
+        parent->avl_bf = BinTree::AVL_RH;
+      } else {
+        parent->avl_bf = BinTree::AVL_LH;
+      }
+      break;
+    }
+
+    int parent_data = parent->data;
+
+    /*
+     * 从较高的子树删除，以parent为根的子树的高度降低，需要回溯往前继续处理高度降低的影响
+     */
+    if ((parent->avl_bf == BinTree::AVL_LH && delete_from_left == true) ||
+        (parent->avl_bf == BinTree::AVL_RH && delete_from_left == false)
+        ) {
+      parent->avl_bf = BinTree::AVL_EH;
+    } else if (delete_from_left && parent->avl_bf == BinTree::AVL_RH) {
+      if (parent->rchild->avl_bf == BinTree::AVL_RH) {
+        parent->avl_bf = BinTree::AVL_EH;
+        parent->rchild->avl_bf = BinTree::AVL_EH;
+        BinTree::AVL_l_rotate__s(&parent);
+      } else if (parent->rchild->avl_bf == BinTree::AVL_EH) {
+        parent->avl_bf = BinTree::AVL_RH;
+        parent->rchild->avl_bf = BinTree::AVL_LH;
+        BinTree::AVL_l_rotate__s(&parent);
+        lower = false;
+      } else {
+        /*
+         * BETTER STYLE, LESS TRAP.
+         *
+         *   if (BinTree::AVL_EH == parent->rchild->lchild->avl_bf)
+        */
+        if (parent->rchild->lchild->avl_bf == BinTree::AVL_EH) {
+          parent->avl_bf = BinTree::AVL_EH;
+          parent->rchild->avl_bf = BinTree::AVL_EH;
+        } else if (parent->rchild->lchild->avl_bf == BinTree::AVL_LH) {
+          parent->avl_bf = BinTree::AVL_EH;
+          parent->rchild->avl_bf = BinTree::AVL_RH;
+        } else {
+          parent->avl_bf = BinTree::AVL_LH;
+          parent->rchild->avl_bf = BinTree::AVL_EH;
+        }
+        parent->rchild->lchild->avl_bf = BinTree::AVL_EH;
+        BinTree::AVL_r_rotate__s(&(parent->rchild));
+        BinTree::AVL_l_rotate__s(&parent);
+      }
+    } else {
+      if (parent->lchild->avl_bf == BinTree::AVL_LH) {
+        parent->avl_bf = BinTree::AVL_EH;
+        parent->lchild->avl_bf = BinTree::AVL_EH;
+        BinTree::AVL_r_rotate__s(&parent);
+      } else if (parent->lchild->avl_bf == BinTree::AVL_EH) {
+        parent->avl_bf = BinTree::AVL_LH;
+        parent->lchild->avl_bf = BinTree::AVL_RH;
+        BinTree::AVL_r_rotate__s(&parent);
+        lower = false;
+      } else {
+        if (parent->lchild->rchild->avl_bf == BinTree::AVL_EH) {
+          parent->avl_bf = BinTree::AVL_EH;
+          parent->lchild->avl_bf = BinTree::AVL_EH;
+        } else if (parent->lchild->rchild->avl_bf == BinTree::AVL_RH) {
+          parent->avl_bf = BinTree::AVL_EH;
+          parent->lchild->avl_bf = BinTree::AVL_LH;
+        } else {
+          parent->avl_bf = BinTree::AVL_RH;
+          parent->lchild->avl_bf = BinTree::AVL_EH;
+        }
+        parent->lchild->rchild->avl_bf = BinTree::AVL_EH;
+        BinTree::AVL_l_rotate__s(&(parent->lchild));
+        BinTree::AVL_r_rotate__s(&parent);
+      }
+    }
+
+    if (path.top() == NULL) {
+      *root = parent;
+    } else {
+      if (path.top()->data > parent_data) {
+        delete_from_left = true;
+        path.top()->lchild = parent;
+      } else {
+        delete_from_left = false;
+        path.top()->rchild = parent;
+      }
+      if (!lower) {
+        break;
+      }
+    }
+  } // while loop
+}
 
 bool BinTree::AVL_insert(BinTree **root, int data) {
   bool no_used;
@@ -84,6 +275,13 @@ bool BinTree::AVL_insert__(BinTree **root, int data, bool *taller) {
   return true;
 }
 
+void BinTree::AVL_l_rotate__s(BinTree **unblanced) {
+  BinTree *p = (*unblanced)->rchild;
+  (*unblanced)->rchild = p->lchild;
+  p->lchild = *unblanced;
+  *unblanced = p;
+}
+
 void BinTree::AVL_l_rotate__(BinTree **unblanced) {
   BinTree *p = (*unblanced)->rchild;
   (*unblanced)->rchild = p->lchild;
@@ -97,6 +295,13 @@ void BinTree::AVL_l_rotate__(BinTree **unblanced) {
   rdeepth -= p->avl_bf;
   //cout << ldeepth << ", " << rdeepth << ", " << ldeepth - rdeepth << endl;
   p->avl_bf = (BF_TYPE)(ldeepth - rdeepth);
+  *unblanced = p;
+}
+
+void BinTree::AVL_r_rotate__s(BinTree **unblanced) {
+  BinTree *p = (*unblanced)->lchild;
+  (*unblanced)->lchild = p->rchild;
+  p->rchild = *unblanced;
   *unblanced = p;
 }
 
@@ -289,6 +494,14 @@ void BinTree::MiddleTraverse(const BinTree *root) {
   if (root) {
     MiddleTraverse(root->lchild);
     cout << root->data << " ";
+
+    /*
+    int l = Deepth(root->lchild);
+    int r = Deepth(root->rchild);
+    if (l - r != root->avl_bf) {
+      cout << "houj bf error ################## ";
+    }
+    */
     MiddleTraverse(root->rchild);
   }
 }

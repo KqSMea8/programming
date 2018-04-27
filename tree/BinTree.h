@@ -1,3 +1,5 @@
+#include <stack>
+
 class BinTree {
 public:
   // basic bin tree
@@ -16,6 +18,7 @@ public:
 
   // balanced BST
   static bool AVL_insert(BinTree **root, int data);
+  static void AVL_delete(BinTree **root, int data);
 
 private:
   int data;
@@ -35,7 +38,11 @@ private:
   static BinTree *BST_find__(BinTree *root, int data, BinTree **parent);
   static bool AVL_insert__(BinTree **root, int data, bool *taller);
   static void AVL_l_rotate__(BinTree **unblanced);
+  static void AVL_l_rotate__s(BinTree **unblanced);
   static void AVL_r_rotate__(BinTree **unblanced);
+  static void AVL_r_rotate__s(BinTree **unblanced);
+
+  friend void adjust_tree(std::stack<BinTree *> &path, bool delete_from_left, BinTree **root);
 };
 
 
