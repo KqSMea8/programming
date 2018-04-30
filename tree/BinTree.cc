@@ -5,6 +5,9 @@
 
 using namespace std;
 
+/*
+ * 平衡二叉树之删除节点: https://blog.csdn.net/goodluckwhh/article/details/11786079
+ */
 void BinTree::AVL_delete(BinTree **root, int data) {
   BinTree *parent = NULL;
   BinTree *pos = BST_find__(*root, data, &parent);
