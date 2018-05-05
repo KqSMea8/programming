@@ -2,8 +2,131 @@
 #include <iostream>
 #include <string.h>
 #include <assert.h>
+#include <vector>
+#include <cstdlib>
 
 using namespace std;
+
+void BTree::Delete(BTree **root, int key) {
+  Result res = Search__(*root, key);
+  // key does not exist
+  if (false == res.found) {
+    return;
+  }
+  if (res.p->childs[0]) { // 转化为删除终端节点
+    BTree *right = res.p->childs[res.index + 1];
+    while(right->childs[0])
+      right = right->childs[0];
+    res.p->keys[res.index] = right->keys[0];
+    res.p = right;
+    res.index = 0;
+  }
+
+  BTree *dnode = res.p;
+  int index = res.index;
+  int left_right = 1;
+  bool del = false;
+  while(1) {
+    remove_in_node(dnode, index, left_right, del);
+    if (dnode->keynum >= BTree::m / 2) { // case 1
+      break; // deletion is over
+    }
+
+    BTree *lsib, *rsib;
+    get_siblings(dnode, lsib, rsib);
+    if (!lsib && !rsib) { // root
+      if (dnode->keynum > 0) {
+        break;
+      } else {
+        *root = dnode->childs[0]; // new root and btree is lower, or btree is empty now
+        if (dnode->childs[0]) {
+          dnode->childs[0]->parent = 0;
+        }
+        delete dnode;
+        break;
+      }
+    }
+    BTree *r = 0;
+    // find the 'the rich'
+    if (lsib && lsib->keynum > BTree::m / 2)
+      r = lsib;
+    if (!r && (rsib && rsib->keynum > BTree::m / 2))
+      r = rsib;
+
+    int dnode_index = 0;
+    while (dnode != dnode->parent->childs[dnode_index])
+      dnode_index++;
+
+    if (r) { // case 2: 拆借
+      if (r == rsib) {
+        Insert_helper(dnode, dnode->keynum, dnode->parent->keys[dnode_index], r->childs[0]);
+        dnode->parent->keys[dnode_index] = r->keys[0];
+        index = 0;
+        left_right = 0;
+      } else {
+        int i;
+        for (i = dnode->keynum; i > 0; i--) {
+          dnode->keys[i] = dnode->keys[i-1];
+          dnode->childs[i + 1] = dnode->childs[i];
+        }
+        dnode->childs[1] = dnode->childs[0];
+        dnode->keys[0] = dnode->parent->keys[dnode_index-1];
+        dnode->childs[0] = r->childs[r->keynum];
+        if (dnode->childs[0]) {
+          dnode->childs[0]->parent = dnode;
+        }
+        dnode->keynum += 1;
+
+        dnode->parent->keys[dnode_index-1] = r->keys[r->keynum-1];
+        index = r->keynum - 1;
+        left_right = 1;
+      }
+      dnode = r;
+      del = false;
+    } else { // case 3: 合并
+      if ((BTree::m % 2 == 0) && (dnode->keynum == BTree::m / 2 - 1)) {
+        /*
+         * btree shall not support even m
+         */
+        break;
+      }
+      if (dnode_index) { // dnode must have left sibling
+        merge_nodes(lsib, dnode->parent->keys[dnode_index-1], dnode);
+        index = dnode_index - 1;
+      } else {
+        merge_nodes(dnode, dnode->parent->keys[dnode_index], rsib);
+        index = dnode_index;
+      }
+      dnode = dnode->parent;
+      del = true;
+      left_right = 1;
+    }
+  }
+
+}
+
+void BTree::get_siblings(BTree *p, BTree *&lsib, BTree *&rsib) {
+  int a;
+  a = 0;
+  BTree *parent = p->parent;
+  if (0 == parent) { // root
+    lsib = rsib = 0;
+    return;
+  }
+
+  while (parent->childs[a] != p)
+    a++;
+  if (0 == a) { // no left sibling
+    lsib = 0;
+   } else {
+     lsib = parent->childs[a-1];
+   }
+  if (parent->keynum == a) { // no right sibling
+    rsib = 0;
+  } else {
+    rsib = parent->childs[a+1];
+  }
+}
 
 bool BTree::Insert(BTree **root, int key) {
   Result res = Search__(*root, key);
@@ -112,7 +235,32 @@ bool BTree::Insert(BTree **root, int key) {
   return true;
 }
 
+void BTree::merge_nodes(BTree *left, int key, BTree *right) {
+  Insert_helper(left, left->keynum, key, right->childs[0]);
+  int i;
+  for (i = 0; i < right->keynum; i++) {
+    Insert_helper(left, left->keynum, right->keys[i], right->childs[i+1]);
+  }
+}
+
+void BTree::remove_in_node(BTree *node, int index, int a, bool del) {
+  BTree *p = node->childs[index + a];
+  int i,j;
+  for (i = index, j = index + a; i < node->keynum - 1; i++, j++) {
+    node->keys[i] = node->keys[i+1];
+    node->childs[j] = node->childs[j+1];
+  }
+  if (0 == a) {
+    node->childs[j] = node->childs[j+1];
+  }
+  node->keynum -= 1;
+  if (del && p) {
+    delete p;
+  }
+}
+
 void BTree::Insert_helper(BTree *p, int index, int key, BTree *q) {
+    assert(p->keynum < BTree::m - 1);
     int i;
     for (i = p->keynum; i > index; i--) {
       p->keys[i] = p->keys[i-1];
@@ -140,17 +288,58 @@ void BTree::print_node(const BTree *p) {
   cout << p->childs[i] << "]" << endl;
 }
 
-void BTree::Traverse(const BTree *root) {
+void BTree::Traverse(const BTree *root, bool clear) {
+  static int v = -10000000;
+  if (clear) {
+    v = -10000000;
+    clear = false;
+  }
+
+
   if (0 == root) {
     return;
   }
   int i;
+  vector<int> keys;
+  if (root->keynum + 1 > BTree::m || root->keynum == 0) {
+      cerr <<("###########   houjie errorrrrrrrrrrrrrrrrrrrrrrrrrrrrr line:") << __LINE__ << endl;
+      print_node(root);
+      exit(1);
+  }
+  if (root->parent) {
+    if (root->keynum + 1 < BTree::m / 2 + 1 && (BTree::m % 2)) {
+        cerr <<("###########   houjie errorrrrrrrrrrrrrrrrrrrrrrrrrrrrr line:") << __LINE__ << endl;
+        print_node(root);
+        exit(1);
+  }
+  } else {
+    if (root->childs[0]) {
+      if (root->keynum + 1 < 2) {
+        cerr <<("###########   houjie errorrrrrrrrrrrrrrrrrrrrrrrrrrrrr line:") << __LINE__ << endl;
+        print_node(root);
+        exit(1);
+  }
+    }
+  }
 
   for(i = 0; i < root->keynum; i++) {
     Traverse(root->childs[i]);
-    cout << root->keys[i] << " ";
+    cout << root->keys[i] << " " << endl;
+    if (v >= root->keys[i]) {
+      cout << v << " " << root->keys[i] << endl;
+      cerr <<("###########   houjie errorrrrrrrrrrrrrrrrrrrrrrrrrrrrr line:") << __LINE__ << endl;
+      exit(1);
+    }
+    v = root->keys[i];
+    keys.push_back(v);
   }
   Traverse(root->childs[i]);
+  cout << "     [";
+  for (i = 0; i < keys.size(); i++) {
+    cout << keys[i] << " ";
+  }
+  cout << "]" << endl;
+
 }
 
 void BTree::print_all_nodes(const BTree *root) {
@@ -161,7 +350,7 @@ void BTree::print_all_nodes(const BTree *root) {
 
   print_node(root);
   for(i = 0; i < root->keynum + 1; i++) {
-    Traverse(root->childs[i]);
+    print_all_nodes(root->childs[i]);
   }
 }
 
