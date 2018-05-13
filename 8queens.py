@@ -1,17 +1,20 @@
+# -*- coding:utf8 -*-
+# selected[i] = j --> i-th queen stands at j col
+queens = 13
 def func(row = 0, selected = []):
     choice = []
     if row == 0:
-        choice = range(0, 8)
+        choice = range(0, queens)
     else:
-        for i in xrange(0, 8):
+        for i in xrange(0, queens):
             for j in xrange(row):
-                if i == selected[j]:
+                if i == selected[j]: # col crashing
                     break
-                if row - j == abs(i - selected[j]):
+                if row - j == abs(i - selected[j]): # diagonal crashing
                     break
             else:
                 choice.append(i)
-    if row == 7:
+    if row == queens - 1:
         return len(choice)
     else:
         count = 0
