@@ -3,7 +3,7 @@
 
 bool print(const data_t &d)
 {
-    std::cout << d.type << std::endl;
+    std::cout << d.type.v << std::endl;
     return true;
 }
 
@@ -13,7 +13,8 @@ int main() {
     data_t data;
 
     for (int i = 0; i < 1000; i++) {
-        data.type = i;
+        T t(i);
+        data.type = std::move(t);
         smt.add_data(data);
     }
     smt.stop();

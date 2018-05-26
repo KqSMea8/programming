@@ -19,10 +19,11 @@ bool processor::start()
 
 void processor::thread_func()
 {
+    std::unique_lock<std::mutex> lck(data_mtx, std::defer_lock);
+    data_t data;
     while(1) {
-        data_t data;
         {
-            std::unique_lock<std::mutex> lck(data_mtx);
+            lck.lock();
             while(running && data_queue.empty())
             {
                 data_cond.wait(lck);
@@ -31,8 +32,9 @@ void processor::thread_func()
             {
                 break;
             }
-            data = data_queue.front();
+            data = std::move(data_queue.front());
             data_queue.pop();
+            lck.unlock();
         }
         if(!handle(data))
         {
@@ -42,14 +44,14 @@ void processor::thread_func()
 }
 
 
-void processor::add_data(const data_t &d)
+void processor::add_data(data_t &d)
 {
     if (!running)
     {
         return;
     }
     std::lock_guard<std::mutex> lck(data_mtx);
-    data_queue.push(d);
+    data_queue.push(std::move(d));
     data_cond.notify_all();
 }
 
