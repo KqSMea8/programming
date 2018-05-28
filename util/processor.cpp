@@ -24,10 +24,15 @@ void processor::thread_func()
     while(1) {
         {
             lck.lock();
-            while(running && data_queue.empty())
+            /*while(running && data_queue.empty())
             {
                 data_cond.wait(lck);
             }
+            */
+            data_cond.wait(lck, [this] {
+                    return !this->running || !this->data_queue.empty();
+                    }
+                    );
             if (!running)
             {
                 break;
@@ -51,7 +56,7 @@ void processor::add_data(data_t &d)
         return;
     }
     std::lock_guard<std::mutex> lck(data_mtx);
-    data_queue.push(std::move(d));
+    data_queue.emplace(std::move(d));
     data_cond.notify_all();
 }
 
