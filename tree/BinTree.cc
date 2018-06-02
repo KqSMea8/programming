@@ -2,6 +2,9 @@
 #include<iostream>
 #include<queue>
 #include<stack>
+#include<vector>
+#include<stdexcept>
+#include<cstdlib>
 
 using namespace std;
 
@@ -196,6 +199,129 @@ void adjust_tree(stack<BinTree *> &path, bool delete_from_left, BinTree **root) 
       }
     }
   } // while loop
+}
+
+bool BinTree::RB_insert(BinTree **root, int data) {
+  /*
+   * case 1: data is the root node, i.e., first node of red–black tree
+   */
+  if (0 == *root) {
+    BinTree *p = new BinTree(data);
+    p->rb_clr = RB_COLOR_BLACK;
+    *root = p;
+    return true;
+  }
+
+  vector<BinTree *>path;
+  path.push_back(0); // root has no parent
+  BinTree *p = *root;
+  while(p)
+  {
+      if (p->data == data) // already exist
+          return false;
+      path.push_back(p);
+      if (p->data > data) p = p->lchild;
+      else                p = p->rchild;
+  }
+  BinTree *node = new BinTree(data);
+  node->rb_clr = RB_COLOR_RED;
+  p = path.back();
+  path.pop_back();
+  if (p->data > data) p->lchild = node;
+  else                p->rchild = node;
+
+  BinTree *g; // grandparent
+  BinTree *u; // uncle
+  while (1)
+  {
+      // in case of case 3
+      if (!p)
+      {
+          node->rb_clr = RB_COLOR_BLACK;
+          break;
+      }
+      // case 2
+      if (p->rb_clr == RB_COLOR_BLACK)
+          break;
+
+      g = path.back();
+      path.pop_back();
+      bool isLeft;
+      u = getSibling(g, p, isLeft);
+
+      // case 3
+      if (u && u->rb_clr == RB_COLOR_RED)
+      {
+          p->rb_clr = RB_COLOR_BLACK;
+          u->rb_clr = RB_COLOR_BLACK;
+          g->rb_clr = RB_COLOR_RED;
+          node = g;
+          p = path.back();
+          path.pop_back();
+          continue;
+      }
+
+      // case 4
+      if (g->lchild && node == g->lchild->rchild)
+      {
+          AVL_l_rotate__s(&p);
+          g->lchild = p;
+          node = p->lchild;
+      } else if (g->rchild && node ==  g->rchild->lchild)
+      {
+          AVL_r_rotate__s(&p);
+          g->rchild = p;
+          node = p->rchild;
+      }
+      p->rb_clr = RB_COLOR_BLACK;
+      g->rb_clr = RB_COLOR_RED;
+
+      if (p->lchild == node) isLeft = true;
+      else                   isLeft = false;
+
+      p = path.back();
+      path.pop_back();
+
+      bool mount_to_left;
+      if (p)
+      {
+          if (p->lchild == g) mount_to_left = true;
+          else                mount_to_left = false;
+      }
+
+      if (isLeft)
+      {
+          AVL_r_rotate__s(&g);
+      }
+      else
+      {
+          AVL_l_rotate__s(&g);
+      }
+      if (!p)
+      {
+          *root = g;
+      }
+      else if(mount_to_left) p->lchild = g;
+      else                   p->rchild = g;
+      break;
+  }
+
+  return true;
+}
+
+
+BinTree *BinTree::getSibling(BinTree *parent, BinTree *me, bool &isLeft) {
+  if (!parent || !me) {
+    return 0;
+  }
+  if (parent->data > me->data) {
+    isLeft = false;
+    return parent->rchild;
+  }
+  else {
+    isLeft = true;
+    return parent->lchild;
+  }
 }
 
 bool BinTree::AVL_insert(BinTree **root, int data) {
@@ -438,6 +564,7 @@ void BinTree::LevelTraverse(const BinTree *root) {
       level_start = NULL;
     }
     cout << p->data << " ";
+    //cout << (p->rb_clr == RB_COLOR_BLACK ? "black" : "red") << " ";
     if (p->lchild) {
       if (!level_start) {
         level_start = p->lchild;
@@ -498,6 +625,26 @@ void BinTree::MiddleTraverse(const BinTree *root) {
     MiddleTraverse(root->lchild);
     cout << root->data << " ";
 
+    //property 5:Every path from a given node to any of its descendant NIL nodes contains the same number of black nodes.
+    BinTree::check5__count = -1;
+    vector<const BinTree*> path;
+    int top = -1;
+    if (!RB_check5__(root, path, top)) {
+      cout << "houj rb error 1 ################## ";
+      exit(-1);
+    }
+    // properpty 4:If a node is red, then both its children are black.
+    if (root->rb_clr == RB_COLOR_RED) {
+      if (root->lchild && root->lchild->rb_clr != RB_COLOR_BLACK) {
+        cout << "houj rb error 2 ################## ";
+        exit(-1);
+      }
+      if (root->rchild && root->rchild->rb_clr != RB_COLOR_BLACK) {
+        cout << "houj rb error 3 ################## ";
+        exit(-1);
+      }
+    }
+
     /*
     int l = Deepth(root->lchild);
     int r = Deepth(root->rchild);
@@ -535,6 +682,34 @@ BinTree::~BinTree() {
 const BinTree * BinTree::BST_find(const BinTree *root, int data) {
   BinTree *parent = NULL;
   return BST_find__(const_cast<BinTree *>(root), data, &parent);
+}
+
+int BinTree::check5__count;
+
+bool BinTree::RB_check5__(const BinTree *node, vector<const BinTree *> &path, int top) {
+  if (node) {
+    top++;
+    try{
+      path.at(top) = node;
+    }catch(const std::out_of_range &ex) {
+      path.push_back(node);
+    }
+    if (!RB_check5__(node->lchild, path, top))
+      return false;
+    return RB_check5__(node->rchild, path, top);
+  } else {
+    int count = 0;
+    for (int i = 0; i <= top; i++) {
+      if (path[i]->rb_clr == RB_COLOR_BLACK)
+        count++;
+    }
+    if (check5__count == -1) {
+      check5__count = count;
+      return true;
+    } else {
+      return check5__count == count;
+    }
+  }
 }
 
 
