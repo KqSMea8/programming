@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <script>
+            var video_src = new Array();
+            var playing_id;
+            video_src[0] = "Adventure+Time+Ending+Theme.mp3";
+            video_src[1] = "Holding-All-My-Love-For-You.mp4";
+            function play_av(id)
+            {
+                var video = document.getElementById("vid");
+                video.src = video_src[id];
+                video.volume = 0.5;
+                video.load();
+                playing_id = id;
+            }
+            document.onkeydown = function onkeydown_func()
+            {
+                var video = document.getElementById("vid");
+                switch(event.keyCode)
+                {
+                    case 32:
+                        if (video.paused)
+                        {
+                            video.play();
+                        }
+                        else
+                        {
+                            video.pause();
+                        }
+                        break;
+                    case 38:
+                        if (video.volume < 1.0)
+                            video.volume = video.volume + 0.1;
+                        break;
+                    case 40:
+                        if (video.volume > 0.0)
+                            video.volume = video.volume - 0.1;
+                        break;
+                    case 37:
+                        if (playing_id > 0)
+                        {
+                            playing_id -= 1;
+                            play_av(playing_id);
+                        }
+                        break;
+                    case 39:
+                        if (playing_id < video_src.length-1)
+                        {
+                            playing_id += 1;
+                            play_av(playing_id);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        </script>
+    </head>
+    <body onload="play_av(0)">
+    <center><video id="vid" controls loop autoplay></video></center>
+    </body>
+</html>
