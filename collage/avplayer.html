@@ -1,15 +1,16 @@
 <html>
     <head>
         <script>
-            var video_src = new Array();
+            var playlist = new Array();
             var playing_id;
-            video_src[0] = "Adventure+Time+Ending+Theme.mp3";
-            video_src[1] = "Holding-All-My-Love-For-You.mp4";
+            // add av here
+            playlist[0] = "Adventure+Time+Ending+Theme.mp3";
+            playlist[1] = "Holding-All-My-Love-For-You.mp4";
             function play_av(id)
             {
                 var video = document.getElementById("vid");
-                video.src = video_src[id];
-                video.volume = 0.5;
+                video.src = playlist[id];
+                video.volume = 0.5; // default volume
                 video.load();
                 playing_id = id;
             }
@@ -44,7 +45,7 @@
                         }
                         break;
                     case 39:
-                        if (playing_id < video_src.length-1)
+                        if (playing_id < playlist.length-1)
                         {
                             playing_id += 1;
                             play_av(playing_id);
