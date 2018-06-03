@@ -1,4 +1,4 @@
-def func(l):
+def insertion_sort(l):
     l_len = len(l)
     for i in xrange(1, l_len):
         insert_pos = -1 

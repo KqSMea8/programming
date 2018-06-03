@@ -1,4 +1,4 @@
-def func(l):
+def shell_sort(l):
     l_len = len(l)
     # make 'increment sequence'
     incr = [l_len/2, 0, -1]

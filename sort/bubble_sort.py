@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 # the best
-def bubble_sort_2(lst):
+def bubble_sort(lst):
     lstLen = len(lst)
     #count = 0
     while lstLen >= 2:
@@ -16,7 +16,7 @@ def bubble_sort_2(lst):
     #print "compare:",count
 
 #the better
-def bubble_sort_1(lst):
+def bubble_sort_better(lst):
     lstLen = len(lst)
     #count = 0
     Flag = False
@@ -36,7 +36,7 @@ def bubble_sort_1(lst):
 
     #print "compare:",count
 
-def bubble_sort(lst):
+def bubble_sort_bad(lst):
     lstLen = len(lst)
     #count = 0
     while lstLen >= 2:
