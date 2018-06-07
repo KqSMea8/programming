@@ -1,0 +1,4 @@
+1) update Git
+   (1) sudo add-apt-repository ppa:git-core/ppa
+   (2) sudo apt-get update
+   (3) sudo apt-get install git
