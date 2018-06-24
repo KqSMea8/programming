@@ -3,10 +3,83 @@
 #include<queue>
 #include<stack>
 #include<vector>
+#include<memory>
 #include<stdexcept>
 #include<cstdlib>
 
 using namespace std;
+
+void BinTree::RB_delete(BinTree **root, int data) {
+  BinTree *parent = NULL;
+  BinTree *pos = BST_find__(*root, data, &parent);
+  if (!pos) {
+    return;
+  }
+
+  /*
+   * find the date actually be deleted
+   */
+  int actul_data;
+  if (pos->lchild && pos->rchild) {// delete from the right child
+      // get pos's next node
+    BinTree *del;
+    del = pos->rchild;
+    while (del && del->lchild) {
+      del = del->lchild;
+    }
+    actul_data = del->data;
+  } else {
+    actul_data = data;
+  }
+  pos->data = actul_data;
+  /*
+   * goto actul_data
+   */
+  vector<pair<BinTree *,bool> > path; // (parent, childIsLeft)
+  path.push_back(pair<BinTree *, bool>(NULL, false)); // root has no parent
+  BinTree *p = *root;
+  while (p->data != actul_data) {
+    path.push_back(pair<BinTree *, bool>(p, false));
+    if (p->data > actul_data)
+      p = p->lchild;
+    else
+      p = p->rchild;
+    path.back().second = path.back().first->data > p->data;
+  }
+  std::auto_ptr<BinTree> auto_del(p);
+
+  pair<BinTree *, bool> q;
+  q = path.back();
+  BinTree *nonLeaf = p->lchild ? p->lchild : p->rchild;
+
+  if (p->rb_clr == RB_COLOR_RED)
+  {
+      // rb-tree's root is black, so p's parent must not null
+      if(q.second) q.first->lchild = nonLeaf;
+      else         q.first->rchild = nonLeaf;
+      return;
+  }
+
+  // p is black
+  if (nonLeaf && nonLeaf->rb_clr == RB_COLOR_RED)
+  {
+      nonLeaf->rb_clr = RB_COLOR_BLACK;
+      if (q.first)
+      {
+          if (q.second) q.first->lchild = nonLeaf;
+          else           q.first->rchild = nonLeaf;
+      }
+      else *root = nonLeaf;
+      return;
+  }
+
+  adjust_tree(path, p, root);
+}
+void adjust_tree(std::vector<std::pair<BinTree *,bool> > &path,\
+          BinTree *p, BinTree **root)
+{
+    // TODO
+}
 
 /*
  * 平衡二叉树之删除节点: https://blog.csdn.net/goodluckwhh/article/details/11786079

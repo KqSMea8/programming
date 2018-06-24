@@ -23,6 +23,7 @@ public:
 
   // red-black BST
   static bool RB_insert(BinTree **root, int data);
+  static void RB_delete(BinTree **root, int data);
 
 private:
   int data;
@@ -61,6 +62,8 @@ private:
   static int check5__count;
 
   friend void adjust_tree(std::stack<BinTree *> &path, bool delete_from_left, BinTree **root);
+  friend void adjust_tree(std::vector<std::pair<BinTree *,bool> > &path,\
+          BinTree *p, BinTree **root);
 };
 
 
