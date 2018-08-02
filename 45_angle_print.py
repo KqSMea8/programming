@@ -47,3 +47,4 @@ test = [
 for i in test:
     print i
     func(i)
+    print
