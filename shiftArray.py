@@ -1,8 +1,9 @@
-import copy
-
 def shiftArray(arr, n):
     len_arr = len(arr)
     n = n % len_arr
+    if n == 0:
+        return
+
     temp = arr[0 : len_arr-n]
     head = arr[len_arr-n : ]
     head.extend(temp)
@@ -12,6 +13,9 @@ def shiftArray(arr, n):
 def shiftArray_1(arr, n):
     len_arr = len(arr)
     n = n % len_arr
+    if n == 0:
+        return
+
     arr.reverse()
     for i in xrange(n / 2):
         temp = arr[i]
@@ -23,10 +27,17 @@ def shiftArray_1(arr, n):
         arr[len_arr-1-i] = temp
 
 def gcd(a, b):
+    """
     c = a % b
     while c:
         a,b = b,c
         c = a % b
+    return b
+    """
+    c = max(a, b) - min(a, b)
+    while c:
+        a, b = min(a, b), c
+        c = max(a, b) - min(a, b)
     return b
 
 
@@ -53,11 +64,12 @@ def shiftArray_2(arr, n):
 
 
 
-test = [1,2,3,4,5,6,7,8,9]
-for i in xrange(len(test)):
-    temp = copy.deepcopy(test)
-    print " ",temp
-    shiftArray_2(temp, i)
-    print i, temp
-    print
-
+test = range(50)
+for i in xrange(len(test) + 5):
+    temp1 = test[:]
+    temp2 = test[:]
+    temp3 = test[:]
+    shiftArray_2(temp2, i)
+    shiftArray_1(temp1, i)
+    shiftArray(temp3, i)
+    print i, temp1 == temp2 == temp3
