@@ -62,7 +62,7 @@ def post_traverse(Tree):
         post_traverse(Tree.left)
         post_traverse(Tree.right)
         print Tree.data
-
+'''
 n8 = Node()
 n8.data = 8
 n8.left = None
@@ -112,3 +112,4 @@ print
 for i in xrange(5):
  have = print_n_layer(n8, i)
  print have
+'''
