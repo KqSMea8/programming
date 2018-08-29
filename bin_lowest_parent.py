@@ -1,6 +1,7 @@
 #-*-coding: utf-8 -*-
 import bin_tree_define
 import traverse_bin_tree
+import sys
 
 def func(T, v1, v2, result):
     if T:
@@ -28,7 +29,7 @@ if __name__ == "__main__":
     traverse_bin_tree.top_to_down_traverse(tree)
     print '-----------'
     result = []
-    func(tree, 1, 7, result)
+    func(tree, int(sys.argv[1]), int(sys.argv[2]), result)
     if len(result):
         print result[0]
     else:
