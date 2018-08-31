@@ -15,15 +15,15 @@ public:
 		assert(max_size > 0);
 		this->cur_size = 0;
 	}
-	template<class K, class V>
-	void push(K &&key, V &&value)
+	template<typename KEY, typename VALUE>
+	void push(KEY &&key, VALUE &&value)
 	{
 		if (cached(key))
 		{
 			return;
 		}
-		cache_list.emplace_front(std::forward<K>(key), std::forward<V>(value));
-		cache_map.emplace(std::forward<K>(key), cache_list.begin());
+		cache_list.emplace_front(std::forward<KEY>(key), std::forward<VALUE>(value));
+		cache_map.emplace(std::forward<KEY>(key), cache_list.begin());
 		cur_size++;
 		if (cur_size > max_size)
 		{
