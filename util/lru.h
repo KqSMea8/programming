@@ -22,7 +22,7 @@ public:
 		{
 			return;
 		}
-		cache_list.emplace_front(std::forward<KEY>(key), std::forward<VALUE>(value));
+		cache_list.emplace_front(key, std::forward<VALUE>(value));
 		cache_map.emplace(std::forward<KEY>(key), cache_list.begin());
 		cur_size++;
 		if (cur_size > max_size)
