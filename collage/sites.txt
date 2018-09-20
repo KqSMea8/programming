@@ -18,3 +18,4 @@ tieba.baidu.com
 cn.bing.com
 m.economictimes.com
 www.ft.com
+www.afp.com
