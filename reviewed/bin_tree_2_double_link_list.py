@@ -10,7 +10,7 @@
 双向链表形如：
 4=6=8=10=12=14=16
 '''
-import bin_tree_define
+from tree import bin_tree_lib
 
 def func(T):
     if T:
@@ -30,7 +30,7 @@ def func(T):
             post.left = T
 
 if __name__ == "__main__":
-    tree = bin_tree_define.build_bin_tree()
+    tree = bin_tree_lib.build_bin_tree()
     func(tree)
 
     head = tree

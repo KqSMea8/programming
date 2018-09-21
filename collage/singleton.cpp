@@ -9,10 +9,10 @@ class SingleTon {
 	      SingleTon();
 	      ~SingleTon();
 	      static SingleTon *m_instance;
-              static std::mutex m_mutex;
+          static std::mutex m_mutex;
 };
 
-SingleTon * SingleTon::m_instance = NULL;
+SingleTon * SingleTon::m_instance = nullptr;
 std::mutex SingleTon::m_mutex;
 
 SingleTon::SingleTon() {
@@ -25,9 +25,9 @@ SingleTon::~SingleTon() {
 
 SingleTon* SingleTon::getInstance() {
 	std::cout << __FUNCTION__ << ", " << __LINE__ << std::endl;
-	if (NULL == m_instance) {
+	if (nullptr == m_instance) {
 		std::lock_guard<std::mutex> lck(m_mutex);
-		if (NULL == m_instance) {
+		if (nullptr == m_instance) {
 			m_instance = new SingleTon();
 		}
 	}
