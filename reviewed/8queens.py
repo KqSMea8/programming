@@ -1,6 +1,8 @@
 # -*- coding:utf8 -*-
 # selected[i] = j --> i-th queen stands at j col
-queens = 13
+
+queens = 8
+
 def func(row = 0, selected = []):
     choice = []
     if row == 0:
@@ -26,4 +28,5 @@ def func(row = 0, selected = []):
             count += func(row + 1, selected)
         return count
 
-print func()
+if __name__ == "__main__":
+    print func()

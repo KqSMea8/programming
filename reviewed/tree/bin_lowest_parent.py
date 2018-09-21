@@ -1,6 +1,5 @@
 #-*-coding: utf-8 -*-
-import bin_tree_define
-import traverse_bin_tree
+import bin_tree_lib
 import sys
 
 def func(T, v1, v2, result):
@@ -24,9 +23,9 @@ def func(T, v1, v2, result):
         return [False, False]
 
 if __name__ == "__main__":
-    tree = bin_tree_define.build_bin_tree()
+    tree = bin_tree_lib.build_bin_tree()
     print '-----------'
-    traverse_bin_tree.top_to_down_traverse(tree)
+    bin_tree_lib.top_to_down_traverse(tree)
     print '-----------'
     result = []
     func(tree, int(sys.argv[1]), int(sys.argv[2]), result)

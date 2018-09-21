@@ -1,4 +1,29 @@
+#-*- coding: utf-8 -*-
 import collections
+
+class Node:
+    def __init__(self, data):
+        self.left = None
+        self.right = None
+        self.data = data
+
+#先序建立二叉树，以负数表示空子树
+def build_bin_tree():
+    v = int(input())
+    if v < 0:
+        return None
+    root = Node(v)
+    root.left = build_bin_tree()
+    root.right = build_bin_tree()
+    return root
+
+def bin_tree_deepth(T):
+    if not T:
+        return 0
+    deepl = func(T.left)
+    deepr = func(T.right)
+    deep = deepl if deepl > deepr else deepr
+    return deep + 1
 
 def print_n_layer(Tree, n):
     if Tree == None or n < 0:
