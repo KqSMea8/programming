@@ -1,8 +1,11 @@
+#pragma once
 #include <iostream>
 
 struct Node {
 	Node *next;
 	int value;
+    explicit Node(int v): value(v), next(nullptr){}
+    Node() = default;
 };
 
 Node * createList() {

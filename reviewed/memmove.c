@@ -13,8 +13,6 @@ void *Memmove(void *dest, const void *src, size_t n) {
   if (dest < src) { // from head 
     for (i = 0; i < n; i++) {
       *p++ = *q++;
-      //p++;
-      //q++;
     }
   } else if (dest > src) { //from rear 
     for (i = n-1; i >= 0; i--) {

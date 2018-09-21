@@ -28,5 +28,8 @@ b.append("qza123.com")
 b.append("www.xvideos.com")
 b.append("ero-video.com")
 b.append("ero-video.net")
+b.append("dgbyg55.com")
+b.append("dgbyg54.com")
+b.append("dgbyg53.com")
 for i in b:
     print "127.0.0.1 " + i

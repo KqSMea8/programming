@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
 	if (!strcmp(argv[1], argv[2]))
 	{
-		printf("ÎÄ¼şÃûÒ»Ñù\n");
+		printf("æ–‡ä»¶åä¸€æ ·\n");
 	}
 	FILE *fp1 = fopen(argv[1], "rb");
 	FILE *fp2 = fopen(argv[2], "rb");
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	}
 	if (!fp1 || !fp2)
 	{
-		printf("ÎŞ·¨´ò¿ªÎÄ¼ş\n");
+		printf("æ— æ³•æ‰“å¼€æ–‡ä»¶\n");
 	}
 	fseek(fp1, 0, SEEK_END);
 	int len1 = ftell(fp1);
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 
 	if (len1 != len2)
 	{
-		printf("³¤¶È²»Ò»Ñù:%d %d\n", len1, len2);
+		printf("é•¿åº¦ä¸ä¸€æ ·:%d %d\n", len1, len2);
 		return 0;
 	}
 	fseek(fp1, 0, SEEK_SET);
@@ -46,13 +46,13 @@ int main(int argc, char *argv[])
 	{
 		if (ch1 != ch2)
 		{
-			printf("ÎÄ¼ş²»Ò»Ñù:%lld\n", diff_point);
+			printf("æ–‡ä»¶ä¸ä¸€æ ·:%lld\n", diff_point);
 			return 0;
 		}
 		ch1 = std::fgetc(fp1);
 		ch2 = std::fgetc(fp2);
 		diff_point++;
 	}
-	printf("ÎÄ¼şÒ»Ñù");
+	printf("æ–‡ä»¶ä¸€æ ·");
 	return 0;
 }
