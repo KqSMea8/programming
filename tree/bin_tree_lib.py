@@ -66,6 +66,17 @@ def pre_traverse_non_recursive(Tree):
             p = stack.pop()
             p = p.right
 
+def middle_traverse_non_recursive(Tree):
+    stack = collections.deque()
+    p = Tree
+    while p or len(stack):
+        while p:
+            stack.append(p)
+            p = p.left
+        if len(stack):
+            p = stack.pop()
+            print p.data
+            p = p.right
 
 def pre_traverse(Tree):
     if Tree:
