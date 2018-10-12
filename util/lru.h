@@ -53,6 +53,12 @@ public:
 	{
 		return max_size == cur_size;
 	}
+	void clear()
+	{
+		cache_map.clear();
+		cache_list.clear();
+		cur_size = 0;
+	}
 	
 private:
 	std::list <std::pair<K, V>> cache_list;
