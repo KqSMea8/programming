@@ -1,7 +1,11 @@
+import tree.bin_tree_lib
 def func_1(Tree, path = [], top = -1, sum_ = 0):
     if Tree:
         top += 1
-        path.insert(top, Tree.data)
+        try:
+            path[top] = Tree.data
+        except:
+            path.append(Tree.data)
         sum_ += Tree.data
         if (not Tree.left) and (not Tree.right): #leaf node
             print path[ : top + 1],
@@ -41,3 +45,6 @@ def func(Tree):
             p = p.right
             right_visited[top] = True
 
+if __name__ == "__main__":
+    tree = tree.bin_tree_lib.build_bin_tree()
+    func_1(tree)
