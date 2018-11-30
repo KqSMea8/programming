@@ -38,6 +38,8 @@ b.append("qza123.com")
 b.append("www.xvideos.com")
 b.append("ero-video.com")
 b.append("ero-video.net")
+b.append("27bao.com")
+b.append("www.27baola.net")
 
 a = func2(num)
 for i in xrange(len(a)):
