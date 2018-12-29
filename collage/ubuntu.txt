@@ -2,3 +2,6 @@
    (1) sudo add-apt-repository ppa:git-core/ppa
    (2) sudo apt-get update
    (3) sudo apt-get install git
+
+2) 安装中文输入法
+    https://www.cnblogs.com/asmer-stone/p/9069866.html

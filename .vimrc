@@ -5,6 +5,7 @@ set autoindent
 set cindent
 set smartindent
 set tabstop=4
+set softtabstop=4
 set shiftwidth=4
 set expandtab
 set encoding=utf-8
@@ -14,4 +15,5 @@ set termencoding=utf-8
 set ignorecase
 set background=dark
 colorscheme desert
+"记住上次编辑位置
 au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif

@@ -37,7 +37,7 @@ def coins_better(face_value):
 if __name__ == "__main__":
     print coin_list
     face_value = 1209
-    for i in xrange(1, face_value + 1):
+    for i in xrange(face_value + 1):
         if coins(i) != coins_better(i):
             print i, coins(i), coins_better(i)
 

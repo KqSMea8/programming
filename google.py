@@ -6,7 +6,7 @@ def func(s):
     p = 0
     current_len = 0
     all_same = True
-    for i in xrange(1, len(s)):
+    for i in range(1, len(s)):
         if s[i] == s[p]:
             p -= 1
             current_len += 1
@@ -27,6 +27,6 @@ def func(s):
     return max_len * 2
 
 
-test = "google"
-print test
-print func(test)
+test = "goggog"
+print(test)
+print(func(test))
