@@ -5,3 +5,7 @@
 
 2) 安装中文输入法
     https://www.cnblogs.com/asmer-stone/p/9069866.html
+
+3) linux禁用IPv6的方法：
+    1）在/etc/sysctl.conf文件中加入一行"net.ipv6.conf.all.disable_ipv6 = 1"
+    2）运行"sysctl -p /etc/sysctl.conf"使更改生效或者重启系统

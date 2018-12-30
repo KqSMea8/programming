@@ -1,62 +1,54 @@
-def func1(string):
-    ln = len(string)
-    if ln <= 1:
-        return []
-    if ln == 2:
-        return [string]
-    ret = []
-    for i in xrange(ln - 1):
-        for j in xrange(i + 1, ln):
-            ret.append(string[i] + string[j])
-    return ret;
+import itertools
 
-def func2(string):
-    a = func1(string)
-    for i in string:
-        a.append(i + i)
-    return a
-
-def func3(string):
-    a = func1(string)
-    for i in xrange(len(a)):
-        a.append(a[i][1] + a[i][0])
-    return a
-    
 alpha = "abcdefghigklmnopqrstuvwxyz"
 num = "0123456789"
-a = func3(alpha)
-aa = []
-for i in a:
-    aa.append(i[0] + i[0] + i[1] + i[1])
 
-b = []
-for i in aa:
-    for j in num:
-        b.append(i + j + j + ".com")
+ab = [i for i in itertools.permutations(alpha, 2)]
+aabb = []
+for i in ab:
+    aabb.append(i[0] + i[0] + i[1] + i[1])
 
-b.append("qza123.com")
-b.append("www.xvideos.com")
-b.append("ero-video.com")
-b.append("ero-video.net")
-b.append("27bao.com")
-b.append("www.27baola.net")
-b.append("svipshipin.com")
-b.append("aikanfuli.info")
-b.append("weibo.com")
-b.append("www.weibo.com")
-b.append("weibo.cn")
-b.append("www.weibo.cn")
+two_digit_list = [i for i in itertools.product(num, repeat = 2)]
+two_digit_list = [i[0] + i[1] for i in two_digit_list]
 
-a = func2(num)
-for i in xrange(len(a)):
-    if a[i][1] == a[i][0]:
-        continue
-    a.append(a[i][1] + a[i][0])
+sites = set()
+for i in aabb:
+    for j in two_digit_list:
+        sites.add(i + j + ".com")
 
-for i in a:
-    b.append("dyby" + i + ".com")
-    b.append("dgby" + i + ".com")
-    b.append("dgbyg" + i + ".com")
+sites.add("qza123.com")
+sites.add("www.xvideos.com")
+sites.add("ero-video.com")
+sites.add("ero-video.net")
+sites.add("27bao.com")
+sites.add("www.27baola.net")
+sites.add("svipshipin.com")
+sites.add("aikanfuli.info")
+sites.add("www.aikanfuli.info")
+sites.add("weibo.com")
+sites.add("www.weibo.com")
+sites.add("weibo.cn")
+sites.add("www.weibo.cn")
 
-for i in b:
+n_length_digit_list = []
+max_len = 5 # configible
+for i in range(1, max_len + 1):
+    temp = []
+    for j in itertools.product(num, repeat = i):
+        s = ""
+        for ch in j:
+            s += ch
+        temp.append(s)
+    n_length_digit_list.extend(temp)
+
+
+
+for i in n_length_digit_list :
+    sites.add("dyby" + i + ".com")
+    sites.add("dgby" + i + ".com")
+    sites.add("dgbyg" + i + ".com")
+
+sites = list(sites)
+sites.sort()
+for i in sites:
     print "127.0.0.1 " + i
