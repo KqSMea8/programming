@@ -1,1 +1,6 @@
-deque heapq
+heapq
+bisect ---> Array bisection algorithm
+collections.namedtuple
+collections.deque
+collections.Counter ---> dict subclass for counting hashable objects
+array.array ---> Efficient arrays of numeric values
